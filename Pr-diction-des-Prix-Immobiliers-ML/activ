@@ -1,0 +1,9 @@
+# Activer l'environnement
+conda activate heart-disease-prediction
+
+# Lancer Jupyter
+jupyter notebook
+
+
+# Redémarrer complètement Jupyter
+jupyter notebook --no-browser
