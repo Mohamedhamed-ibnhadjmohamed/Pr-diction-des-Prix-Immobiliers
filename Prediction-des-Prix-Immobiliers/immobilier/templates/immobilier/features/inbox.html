@@ -1,0 +1,112 @@
+{% extends 'immobilier/base.html' %}
+
+{% block title %}Boîte de réception - Prediction Immobilière{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-inbox"></i> Boîte de réception</h1>
+                {% if unread_count %}
+                <span class="badge bg-danger">{{ unread_count }} non lus</span>
+                {% endif %}
+            </div>
+            
+            {% if messages %}
+            <div class="list-group">
+                {% for message in messages %}
+                <div class="list-group-item {% if not message.is_read %}list-group-item-primary{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="mb-1">
+                                    <i class="fas fa-envelope"></i> {{ message.subject }}
+                                    {% if not message.is_read %}
+                                    <span class="badge bg-warning ms-2">Nouveau</span>
+                                    {% endif %}
+                                </h6>
+                                <small class="text-muted">
+                                    De: {{ message.sender.get_full_name|default:message.sender.email }} | 
+                                    {{ message.created_at|date:"d/m/Y H:i" }}
+                                </small>
+                            </div>
+                            
+                            <p class="mb-2">{{ message.content|truncatewords:30 }}</p>
+                            
+                            {% if message.property %}
+                            <div class="alert alert-light py-2">
+                                <small>
+                                    <i class="fas fa-home"></i> Concernant le bien: 
+                                    <a href="{% url 'immobilier:property_detail' message.property.pk %}" class="btn btn-sm btn-outline-primary">Voir</a>
+                                </small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="ms-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="markAsRead({{ message.pk }})">
+                                {% if message.is_read %}
+                                <i class="fas fa-envelope-open"></i> Lu
+                                {% else %}
+                                <i class="fas fa-envelope"></i> Marquer comme lu
+                                {% endif %}
+                            </button>
+                            
+                            <button class="btn btn-sm btn-outline-success" onclick="replyToMessage({{ message.pk }}, '{{ message.sender.pk }}')">
+                                <i class="fas fa-reply"></i> Répondre
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                <h4>Vous n'avez aucun message</h4>
+                <p class="text-muted">Votre boîte de réception est vide.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function markAsRead(messageId) {
+    fetch(`/mark-message-read/${messageId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            location.reload();
+        }
+    });
+}
+
+function replyToMessage(messageId, senderId) {
+    // Rediriger vers la page d'envoi de message avec le destinataire pré-rempli
+    window.location.href = `/send-message/?recipient=${senderId}&reply_to=${messageId}`;
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

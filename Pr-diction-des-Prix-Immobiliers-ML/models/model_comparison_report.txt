@@ -1,0 +1,35 @@
+
+# RAPPORT D'ANALYSE COMPARATIVE DES MODÈLES
+
+## Date d'analyse: 2026-04-28 13:38:39
+## Dataset: 5601 annonces immobilières
+## Features: 28
+
+## CLASSEMENT DES MODÈLES (par R² Test)
+            Model  R² Test   RMSE Test   MAE Test  Training Time
+Linear Regression   0.4708 197432.3116 80336.6319         0.0479
+Gradient Boosting   0.4656 198396.2178 80448.0706         0.7953
+    Random Forest   0.4604 199358.2379 81023.3735         0.2909
+          XGBoost   0.4603 199371.3061 80904.1656         0.2983
+              KNN   0.2064 241769.0479 99874.2674         0.0016
+
+## MEILLEUR MODÈLE
+- Nom: Linear Regression
+- R²: 0.4708
+- RMSE: 197,432 DT
+- MAE: 80,337 DT
+- Temps d'entraînement: 0.05s
+
+## ANALYSE STATISTIQUE
+- Test de Friedman: p=0.000000
+- Différences significatives: Oui
+
+## RECOMMANDATIONS
+- Production: Linear Regression
+- Rapidité: KNN
+- Stabilité: KNN
+- Interprétabilité: Linear Regression
+
+## CONCLUSION
+Le modèle Linear Regression offre les meilleures performances avec R² = 0.4708.
+Cependant, le choix optimal dépend des besoins spécifiques du projet.

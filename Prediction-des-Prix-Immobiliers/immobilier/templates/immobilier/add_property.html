@@ -1,0 +1,251 @@
+{% extends 'immobilier/base.html' %}
+
+{% block title %}Ajouter un bien immobilier{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0"><i class="fas fa-plus-circle"></i> Ajouter un bien immobilier</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <h4 class="mb-3">Informations principales</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ property_form.title.id_for_label }}" class="form-label">
+                                        Titre <span class="text-danger">*</span>
+                                    </label>
+                                    {{ property_form.title }}
+                                    {% if property_form.title.errors %}
+                                    <div class="text-danger small">{{ property_form.title.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ property_form.property_type.id_for_label }}" class="form-label">
+                                        Type de bien <span class="text-danger">*</span>
+                                    </label>
+                                    {{ property_form.property_type }}
+                                    {% if property_form.property_type.errors %}
+                                    <div class="text-danger small">{{ property_form.property_type.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ property_form.city.id_for_label }}" class="form-label">
+                                        Ville <span class="text-danger">*</span>
+                                    </label>
+                                    {{ property_form.city }}
+                                    {% if property_form.city.errors %}
+                                    <div class="text-danger small">{{ property_form.city.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ property_form.postal_code.id_for_label }}" class="form-label">
+                                        Code postal <span class="text-danger">*</span>
+                                    </label>
+                                    {{ property_form.postal_code }}
+                                    {% if property_form.postal_code.errors %}
+                                    <div class="text-danger small">{{ property_form.postal_code.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ property_form.price.id_for_label }}" class="form-label">
+                                        Prix (D) <span class="text-danger">*</span>
+                                    </label>
+                                    {{ property_form.price }}
+                                    {% if property_form.price.errors %}
+                                    <div class="text-danger small">{{ property_form.price.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ property_form.address.id_for_label }}" class="form-label">
+                                Adresse <span class="text-danger">*</span>
+                            </label>
+                            {{ property_form.address }}
+                            {% if property_form.address.errors %}
+                            <div class="text-danger small">{{ property_form.address.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ property_form.description.id_for_label }}" class="form-label">
+                                Description
+                            </label>
+                            {{ property_form.description }}
+                            {% if property_form.description.errors %}
+                            <div class="text-danger small">{{ property_form.description.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <h4 class="mb-3 mt-4">Caractéristiques du bien</h4>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="{{ property_form.surface.id_for_label }}" class="form-label">
+                                        Surface (m²) <span class="text-danger">*</span>
+                                    </label>
+                                    {{ property_form.surface }}
+                                    {% if property_form.surface.errors %}
+                                    <div class="text-danger small">{{ property_form.surface.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="{{ property_form.rooms.id_for_label }}" class="form-label">
+                                        Pièces <span class="text-danger">*</span>
+                                    </label>
+                                    {{ property_form.rooms }}
+                                    {% if property_form.rooms.errors %}
+                                    <div class="text-danger small">{{ property_form.rooms.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="{{ property_form.bedrooms.id_for_label }}" class="form-label">
+                                        Chambres <span class="text-danger">*</span>
+                                    </label>
+                                    {{ property_form.bedrooms }}
+                                    {% if property_form.bedrooms.errors %}
+                                    <div class="text-danger small">{{ property_form.bedrooms.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="{{ property_form.bathrooms.id_for_label }}" class="form-label">
+                                        Salles de bain <span class="text-danger">*</span>
+                                    </label>
+                                    {{ property_form.bathrooms }}
+                                    {% if property_form.bathrooms.errors %}
+                                    <div class="text-danger small">{{ property_form.bathrooms.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4 class="mb-3 mt-4">Équipements et caractéristiques supplémentaires</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ feature_form.construction_year.id_for_label }}" class="form-label">
+                                        Année de construction
+                                    </label>
+                                    {{ feature_form.construction_year }}
+                                    {% if feature_form.construction_year.errors %}
+                                    <div class="text-danger small">{{ feature_form.construction_year.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ feature_form.energy_efficiency.id_for_label }}" class="form-label">
+                                        Performance énergétique
+                                    </label>
+                                    {{ feature_form.energy_efficiency }}
+                                    {% if feature_form.energy_efficiency.errors %}
+                                    <div class="text-danger small">{{ feature_form.energy_efficiency.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="{{ feature_form.floor.id_for_label }}" class="form-label">
+                                        Étage
+                                    </label>
+                                    {{ feature_form.floor }}
+                                    {% if feature_form.floor.errors %}
+                                    <div class="text-danger small">{{ feature_form.floor.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label for="{{ feature_form.total_floors.id_for_label }}" class="form-label">
+                                        Total étages
+                                    </label>
+                                    {{ feature_form.total_floors }}
+                                    {% if feature_form.total_floors.errors %}
+                                    <div class="text-danger small">{{ feature_form.total_floors.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Équipements</h5>
+                                <div class="form-check mb-2">
+                                    {{ feature_form.has_garden }}
+                                    <label class="form-check-label" for="{{ feature_form.has_garden.id_for_label }}">
+                                        Jardin
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ feature_form.has_pool }}
+                                    <label class="form-check-label" for="{{ feature_form.has_pool.id_for_label }}">
+                                        Piscine
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ feature_form.has_garage }}
+                                    <label class="form-check-label" for="{{ feature_form.has_garage.id_for_label }}">
+                                        Garage
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>&nbsp;</h5>
+                                <div class="form-check mb-2">
+                                    {{ feature_form.has_balcony }}
+                                    <label class="form-check-label" for="{{ feature_form.has_balcony.id_for_label }}">
+                                        Balcon
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ feature_form.has_elevator }}
+                                    <label class="form-check-label" for="{{ feature_form.has_elevator.id_for_label }}">
+                                        Ascenseur
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Ajouter le bien
+                            </button>
+                            <a href="{% url 'immobilier:property_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

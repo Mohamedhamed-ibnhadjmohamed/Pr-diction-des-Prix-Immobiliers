@@ -1,0 +1,111 @@
+{% extends 'immobilier/base.html' %}
+
+{% block title %}Mes Favoris - Prediction Immobilière{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-heart"></i> Mes Favoris</h1>
+                <span class="badge bg-primary">{{ favorites.count }} favoris</span>
+            </div>
+            
+            {% if favorites %}
+            <div class="row">
+                {% for favorite in favorites %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card property-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title">{{ favorite.property.title }}</h5>
+                                <button class="btn btn-sm btn-outline-danger" 
+                                        onclick="confirmRemoveFavorite({{ favorite.property.pk }})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            
+                            <p class="card-text">
+                                <i class="fas fa-map-marker-alt"></i> {{ favorite.property.city }}<br>
+                                <i class="fas fa-expand"></i> {{ favorite.property.surface }}m² | 
+                                <i class="fas fa-door-open"></i> {{ favorite.property.rooms }}p<br>
+                                {% if favorite.property.property_type == 'appartement' %}
+                                <span class="badge bg-primary">
+                            {% elif favorite.property.property_type == 'maison' %}
+                                <span class="badge bg-success">
+                            {% else %}
+                                <span class="badge bg-info">
+                            {% endif %}
+                                    {{ favorite.property.get_property_type_display }}
+                                </span>
+                            </p>
+                            
+                            <div class="price-tag">{{ favorite.property.price|floatformat:0 }}D</div>
+                            
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-heart"></i> Ajouté le {{ favorite.created_at|date:"d/m/Y" }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="{% url 'immobilier:property_detail' favorite.property.pk %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> Voir détails
+                            </a>
+                            <a href="{% url 'immobilier:send_message' %}?property={{ favorite.property.pk }}&recipient={{ favorite.property.created_by.pk }}" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-envelope"></i> Contacter
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-heart fa-4x text-muted mb-3"></i>
+                <h4>Vous n'avez pas encore de favoris</h4>
+                <p class="text-muted">Parcourez les biens et ajoutez-les à vos favoris pour les retrouver facilement.</p>
+                <a href="{% url 'immobilier:property_list' %}" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Parcourir les biens
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmRemoveFavorite(propertyId) {
+    if (confirm('Êtes-vous sûr de vouloir retirer ce bien de vos favoris?')) {
+        fetch(`/remove-favorites/${propertyId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            }
+        });
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

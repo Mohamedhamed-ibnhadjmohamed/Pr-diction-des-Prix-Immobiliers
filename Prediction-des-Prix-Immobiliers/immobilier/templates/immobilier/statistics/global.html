@@ -1,0 +1,208 @@
+{% extends 'immobilier/base.html' %}
+{% load static %}
+{% load immobilier_tags %}
+
+{% block title %}Statistiques globales{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1><i class="fas fa-chart-bar"></i> Statistiques globales</h1>
+            <p class="text-muted">Vue d'ensemble de l'application immobilière</p>
+        </div>
+    </div>
+
+    <!-- Statistiques principales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Biens</h5>
+                    <div class="stats-number">{{ total_properties }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-info text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Utilisateurs</h5>
+                    <div class="stats-number">{{ total_users }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Favoris</h5>
+                    <div class="stats-number">{{ total_favorites }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card bg-success text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Évaluations</h5>
+                    <div class="stats-number">{{ total_ratings }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Prix moyen par type de bien -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-home"></i> Prix moyen par type de bien</h5>
+                </div>
+                <div class="card-body">
+                    {% if avg_price_by_type %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Type de bien</th>
+                                        <th>Prix moyen</th>
+                                        <th>Nombre</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in avg_price_by_type %}
+                                    <tr>
+                                        <td>{{ item.property_type|title }}</td>
+                                        <td class="text-success fw-bold">{{ item.avg_price|floatformat:0 }}D</td>
+                                        <td>{{ item.count }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucune donnée disponible</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top des villes -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-map-marker-alt"></i> Top 10 des villes</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_cities %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Ville</th>
+                                        <th>Nombre de biens</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for city in top_cities %}
+                                    <tr>
+                                        <td>{{ city.city }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar" role="progressbar" 
+                                                     style="width: {{ city.count }}%">
+                                                    {{ city.count }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucune donnée disponible</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <!-- Distribution des types de biens -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Distribution des types de biens</h5>
+                </div>
+                <div class="card-body">
+                    {% if property_types %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Type de bien</th>
+                                        <th>Nombre</th>
+                                        <th>Pourcentage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for type in property_types %}
+                                    <tr>
+                                        <td>{{ type.property_type|title }}</td>
+                                        <td>{{ type.count }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar" role="progressbar" 
+                                                     style="width: {{ type.count }}%">
+                                                    {{ type.count }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Aucune donnée disponible</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-tools"></i> Actions rapides</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'immobilier:export_properties' %}" class="btn btn-success w-100">
+                                <i class="fas fa-download"></i> Exporter les données
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'immobilier:property_list' %}" class="btn btn-primary w-100">
+                                <i class="fas fa-list"></i> Voir tous les biens
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="/admin/" class="btn btn-warning w-100">
+                                <i class="fas fa-cog"></i> Administration
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'immobilier:home' %}" class="btn btn-secondary w-100">
+                                <i class="fas fa-home"></i> Accueil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
