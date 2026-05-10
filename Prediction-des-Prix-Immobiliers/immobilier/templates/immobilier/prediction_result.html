@@ -1,0 +1,98 @@
+{% extends 'immobilier/base.html' %}
+
+{% block title %}Résultat de prédiction{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white text-center">
+                    <h2 class="mb-0"><i class="fas fa-check-circle"></i> Prédiction réussie !</h2>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <h3>Prix estimé du bien</h3>
+                        <div class="display-4 text-success fw-bold">
+                            {{ prediction.predicted_price|floatformat:0 }}D
+                        </div>
+                        <p class="text-muted">
+                            {{ prediction.predicted_price|div:prediction.property.surface|floatformat:0 }}D/m²
+                        </p>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6><i class="fas fa-chart-line"></i> Score de confiance</h6>
+                                    <div class="progress mb-2" style="height: 25px;">
+                                        {% if prediction.confidence_score > 0.8 %}
+                                        <div class="progress-bar bg-success" 
+                                    {% elif prediction.confidence_score > 0.6 %}
+                                        <div class="progress-bar bg-warning" 
+                                    {% else %}
+                                        <div class="progress-bar bg-danger" 
+                                    {% endif %} 
+                                             style="width: {{ prediction.confidence_score|mul:100 }}%">
+                                            {{ prediction.confidence_score|mul:100|floatformat:0 }}%
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        {% if prediction.confidence_score > 0.8 %}
+                                        Très fiable
+                                        {% elif prediction.confidence_score > 0.6 %}
+                                        Fiable
+                                        {% else %}
+                                        Moyennement fiable
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6><i class="fas fa-info-circle"></i> Informations</h6>
+                                    <p class="mb-1"><strong>Type:</strong> {{ prediction.property.get_property_type_display }}</p>
+                                    <p class="mb-1"><strong>Ville:</strong> {{ prediction.property.city }}</p>
+                                    <p class="mb-1"><strong>Surface:</strong> {{ prediction.property.surface }}m²</p>
+                                    <p class="mb-0"><strong>Pièces:</strong> {{ prediction.property.rooms }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-lightbulb"></i> Recommandations</h6>
+                        <ul class="mb-0 text-start">
+                            <li>Cette estimation est basée sur les prix actuels du marché</li>
+                            <li>Les prix peuvent varier selon l'état exact du bien</li>
+                            <li>Considérez les travaux et rénovations nécessaires</li>
+                            <li>Faites évaluer le bien par un professionnel pour une estimation précise</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'immobilier:predict_price' %}" class="btn btn-primary">
+                            <i class="fas fa-calculator"></i> Faire une autre prédiction
+                        </a>
+                        <a href="{% url 'immobilier:property_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-list"></i> Voir les biens similaires
+                        </a>
+                        <a href="{% url 'immobilier:home' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-home"></i> Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer text-muted text-center">
+                    <small>
+                        Prédiction générée le {{ prediction.created_at|date:"d/m/Y à H:i" }} 
+                        avec le modèle {{ prediction.model_version }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

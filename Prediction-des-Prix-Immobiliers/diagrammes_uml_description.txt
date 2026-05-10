@@ -1,0 +1,475 @@
+Description Détaillée pour Diagrammes UML - Projet Prédiction Prix Immobiliers
+=============================================================================
+
+Date: 30 avril 2026
+Projet: Système de Prédiction des Prix Immobiliers
+
+---
+
+1. DIAGRAMME USE CASE (Cas d'utilisation)
+==========================================
+
+**Acteurs principaux :**
+- **Agent Immobilier** : Professionnel qui évalue des propriétés pour ses clients
+- **Investisseur** : Personne cherchant des opportunités d'investissement rentables
+- **Vendeur Particulier** : Propriétaire voulant estimer son bien pour le vendre
+- **Acheteur Particulier** : Personne cherchant à acheter et vérifiant la pertinence des prix
+- **Administrateur Système** : Gère la maintenance et les mises à jour
+
+**Cas d'utilisation principaux :**
+
+**UC1 - Prédire le Prix d'un Bien**
+- Acteur : Agent Immobilier, Investisseur, Vendeur, Acheteur
+- Description : Estimer le prix de vente d'un bien immobilier
+- Préconditions : Utilisateur authentifié, données du bien disponibles
+- Postconditions : Prix prédit généré avec intervalle de confiance
+
+**UC2 - Analyser le Marché Local**
+- Acteur : Investisseur, Agent Immobilier
+- Description : Obtenir des statistiques et tendances sur une zone géographique
+- Préconditions : Localisation définie
+- Postconditions : Rapport marché généré
+
+**UC3 - Comparer des Biens Similaires**
+- Acteur : Acheteur, Investisseur, Agent Immobilier
+- Description : Trouver et comparer des propriétés similaires dans la même zone
+- Préconditions : Caractéristiques du bien de référence
+- Postconditions : Liste de biens comparables avec prix
+
+**UC4 - Sauvegarder une Évaluation**
+- Acteur : Agent Immobilier, Investisseur
+- Description : Enregistrer une prédiction pour référence future
+- Préconditions : Prédiction effectuée, utilisateur connecté
+- Postconditions : Évaluation sauvegardée dans le profil
+
+**UC5 - Exporter un Rapport d'Évaluation**
+- Acteur : Agent Immobilier, Investisseur
+- Description : Générer un PDF détaillé de l'évaluation
+- Préconditions : Évaluation complète disponible
+- Postconditions : Rapport PDF généré et téléchargé
+
+**UC6 - Gérer son Profil Utilisateur**
+- Acteur : Tous les utilisateurs
+- Description : Mettre à jour informations personnelles et préférences
+- Préconditions : Utilisateur authentifié
+- Postconditions : Profil utilisateur mis à jour
+
+**UC7 - Maintenir le Modèle ML**
+- Acteur : Administrateur Système
+- Description : Mettre à jour et réentraîner le modèle de prédiction
+- Préconditions : Nouvelles données disponibles
+- Postconditions : Modèle mis à jour en production
+
+**Cas d'utilisation secondaires :**
+
+**UC8 - Authentification**
+- Acteur : Tous les utilisateurs
+- Description : Se connecter au système
+
+**UC9 - Géolocaliser une Adresse**
+- Acteur : Tous les utilisateurs
+- Description : Convertir une adresse en coordonnées GPS
+
+**UC10 - Valider les Données d'Entrée**
+- Acteur : Système
+- Description : Vérifier la cohérence des caractéristiques saisies
+
+**Relations entre cas d'utilisation :**
+- <<include>> : UC8 inclus dans tous les UC principaux
+- <<extend>> : UC10 étend UC1, UC2, UC3
+- <<generalization>> : UC1 généralise UC2, UC3
+
+---
+
+2. DIAGRAMME DE CLASSES
+=======================
+
+**Package : Domaine Métier**
+
+**Classe : BienImmobilier**
+```
++ id: String
++ adresse: Adresse
++ surface: Double
++ nbPieces: Integer
++ typeBien: TypeBienEnum
++ anneeConstruction: Integer
++ etatGeneral: EtatEnum
++ nbSallesBain: Integer
++ presenceJardin: Boolean
++ presenceBalcon: Boolean
++ presenceTerrasse: Boolean
++ typeChauffage: ChauffageEnum
++ stationnement: StationnementEnum
++ photos: List<String>
++ dateMiseVente: Date
++ prixVente: Double
++ prixEstime: Double
++ scoreConfiance: Double
+---
++ calculerPrixAuM2(): Double
++ calculerAge(): Integer
++ validerCaracteristiques(): Boolean
++ extraireCaracteristiquesPrincipales(): Map<String, Object>
+```
+
+**Classe : Adresse**
+```
++ rue: String
++ codePostal: String
++ ville: String
++ pays: String
++ latitude: Double
++ longitude: Double
++ quartier: String
++ departement: String
++ region: String
+---
++ validerFormat(): Boolean
++ geocoder(): Boolean
++ calculerDistance(AutreAdresse): Double
++ getQuartierInfos(): QuartierInfo
+```
+
+**Classe : QuartierInfo**
+```
++ nomQuartier: String
++ prixMoyenM2: Double
++ densitePopulation: Double
++ scoreTransports: Double
++ scoreEcoles: Double
++ scoreCommerces: Double
++ tauxCriminalite: Double
++ tendanceMarche: TendanceEnum
++ biensSimilaires: List<BienImmobilier>
+---
++ calculerScoreDesirabilite(): Double
++ getBiensSimilaires(BienImmobilier): List<BienImmobilier>
++ updateStatistiques(): void
+```
+
+**Classe : Evaluation**
+```
++ id: String
++ bienImmobilier: BienImmobilier
++ prixPredit: Double
++ intervalleConfiance: Double
++ scoreConfiance: Double
++ dateEvaluation: Date
++ evaluateur: Utilisateur
++ modeleVersion: String
++ facteursInfluence: Map<String, Double>
+---
++ genererRapport(): RapportEvaluation
++ calculerMargeErreur(): Double
++ comparerPrixMarche(): Double
+```
+
+**Package : Utilisateurs**
+
+**Classe : Utilisateur** (abstraite)
+```
+# id: String
+# email: String
+# motDePasse: String
+# nom: String
+# prenom: String
+# telephone: String
+# dateInscription: Date
+# derniereConnexion: Date
+# preferences: PreferencesUtilisateur
+---
++ sAuthentifier(String, String): Boolean
++ seDeconnecter(): void
++ mettreAJourProfil(): void
++ resetMotDePasse(): void
+```
+
+**Classe : AgentImmobilier** (hérite de Utilisateur)
+```
++ numeroAgence: String
++ nomAgence: String
++ numeroLicence: String
++ specialite: List<String>
++ evaluationsEffectuees: List<Evaluation>
++ clients: List<Client>
+---
++ creerEvaluation(BienImmobilier): Evaluation
++ gererClients(): void
++ obtenirStatistiques(): StatistiquesAgent
+```
+
+**Classe : Investisseur** (hérite de Utilisateur)
+```
++ budgetMax: Double
++ zonesInteret: List<String>
++ typeBiensRecherches: List<TypeBienEnum>
++ rendementMinimum: Double
++ portfolio: List<Investissement>
+---
++ analyserOpportunite(BienImmobilier): AnalyseInvestissement
++ calculerRendement(BienImmobilier): Double
++ suivreMarché(): void
+```
+
+**Classe : Particulier** (hérite de Utilisateur)
+```
++ typeProfil: ProfilEnum (VENDEUR/ACHETEUR)
++ biensPossedes: List<BienImmobilier>
++ recherchesSauvegardees: List<Recherche>
+---
++ estimerBien(BienImmobilier): Evaluation
++ sauvegarderRecherche(Recherche): void
++ notifierChangementPrix(BienImmobilier): void
+```
+
+**Package : Machine Learning**
+
+**Classe : ModelePrediction**
+```
++ version: String
++ typeAlgorithme: String
++ dateEntrainement: Date
++ performance: PerformanceMetrics
++ hyperparametres: Map<String, Object>
++ featuresUtilisees: List<String>
+---
++ predire(BienImmobilier): Prediction
++ entrainer(Dataset): void
++ valider(CrossValidation): ValidationResults
++ exporter(): String
+```
+
+**Classe : Prediction**
+```
++ prixEstime: Double
++ intervalleConfianceMin: Double
++ intervalleConfianceMax: Double
++ scoreConfiance: Double
++ tempsCalcul: Long
++ featuresImportance: Map<String, Double>
++ shapValues: Map<String, Double>
+---
++ calculerErreurRelative(Double): Double
++ estFiable(): Boolean
++ getExplication(): String
+```
+
+**Classe : Dataset**
+```
++ nom: String
++ taille: Integer
++ periode: DateRange
++ source: String
++ colonnes: List<String>
++ typesColonnes: Map<String, TypeEnum>
+---
++ charger(): DataFrame
++ nettoyer(): Dataset
++ diviser(Double, Double): Tuple[Dataset, Dataset]
++ getStatistiques(): StatistiquesDataset
+```
+
+**Package : Services**
+
+**Classe : ServicePrediction**
+```
+- modele: ModelePrediction
+- preprocessor: DataPreprocessor
+- validator: InputValidator
+---
++ predirePrix(BienImmobilier): Prediction
++ predireBatch(List<BienImmobilier>): List<Prediction>
++ validerEntrees(BienImmobilier): ValidationResult
++ getModeleInfo(): ModeleInfo
+```
+
+**Classe : ServiceEvaluation**
+```
+- daoEvaluation: EvaluationDAO
+- servicePrediction: ServicePrediction
+- generateurRapport: RapportGenerator
+---
++ creerEvaluation(BienImmobilier, Utilisateur): Evaluation
++ sauvegarderEvaluation(Evaluation): void
++ getEvaluationsUtilisateur(Utilisateur): List<Evaluation>
++ genererRapportPDF(Evaluation): byte[]
+```
+
+**Classe : ServiceMarche**
+```
+- daoBien: BienImmobilierDAO
+- apiExternes: List<APIExterne>
+---
++ getStatistiquesQuartier(String): QuartierInfo
++ getBiensSimilaires(BienImmobilier): List<BienImmobilier>
++ getTendanceMarche(String): TendanceMarche
++ actualiserDonneesMarche(): void
+```
+
+**Relations principales :**
+- **Association 1..* :** Utilisateur → Evaluation
+- **Composition :** BienImmobilier → Adresse
+- **Agrégation :** Evaluation → BienImmobilier
+- **Dépendance :** ServicePrediction → ModelePrediction
+- **Héritage :** AgentImmobilier, Investisseur, Particulier → Utilisateur
+
+---
+
+3. DIAGRAMME DE SÉQUENCE
+=========================
+
+**Séquence 1 : Prédiction de Prix par un Agent Immobilier**
+
+**Acteurs :**
+- Agent (AgentImmobilier)
+- InterfaceWeb (Frontend)
+- API (ServicePrediction)
+- ModeleML (ModelePrediction)
+- BDD (Base de données)
+
+**Scénario nominal :**
+```
+1. Agent → InterfaceWeb : saisitCaracteristiquesBien()
+2. InterfaceWeb → API : POST /predict (donneesBien)
+3. API → API : validerDonnees(donneesBien)
+4. API → BDD : getQuartierInfo(adresse)
+5. BDD → API : quartierInfo
+6. API → API : pretraitementDonnees(donneesBien, quartierInfo)
+7. API → ModeleML : predire(featuresPretraitees)
+8. ModeleML → ModeleML : calculerPrediction()
+9. ModeleML → API : prediction(prix, confiance)
+10. API → API : formaterResultats(prediction)
+11. API → InterfaceWeb : response(prediction)
+12. InterfaceWeb → Agent : afficherPrediction(prixEstime, intervalleConfiance)
+```
+
+**Scénarios d'exception :**
+- **Données invalides :** API → InterfaceWeb : erreur("Données incomplètes")
+- **Modèle indisponible :** API → InterfaceWeb : erreur("Service temporairement indisponible")
+- **Timeout :** API → InterfaceWeb : erreur("Délai d'attente dépassé")
+
+**Séquence 2 : Analyse de Marché par un Investisseur**
+
+**Acteurs :**
+- Investisseur
+- InterfaceMobile
+- ServiceMarche
+- APIExterne
+- CacheRedis
+
+**Scénario :**
+```
+1. Investisseur → InterfaceMobile : demandeAnalyseQuartier(quartier)
+2. InterfaceMobile → ServiceMarche : getStatistiquesQuartier(quartier)
+3. ServiceMarche → CacheRedis : get(quartier_stats)
+4. CacheRedis → ServiceMarche : null (données non en cache)
+5. ServiceMarche → BDD : getBiensQuartier(quartier)
+6. BDD → ServiceMarche : listeBiens
+7. ServiceMarche → APIExterne : getIndicesPrix(quartier)
+8. APIExterne → ServiceMarche : indicesMarche
+9. ServiceMarche → ServiceMarche : calculerStatistiques(listeBiens, indicesMarche)
+10. ServiceMarche → CacheRedis : set(quartier_stats, statistiques, TTL=1h)
+11. ServiceMarche → InterfaceMobile : statistiquesQuartier
+12. InterfaceMobile → Investisseur : afficherAnalyse(graphiques, tendances)
+```
+
+**Séquence 3 : Génération de Rapport d'Évaluation**
+
+**Acteurs :**
+- Agent
+- ServiceEvaluation
+- ServicePrediction
+- GenerateurPDF
+- StockageS3
+
+**Scénario :**
+```
+1. Agent → ServiceEvaluation : demanderRapport(evaluationId)
+2. ServiceEvaluation → BDD : getEvaluation(evaluationId)
+3. BDD → ServiceEvaluation : evaluation
+4. ServiceEvaluation → ServicePrediction : getDetailsPrediction(evaluation.bien)
+5. ServicePrediction → ServiceEvaluation : detailsPrediction
+6. ServiceEvaluation → ServiceMarche : getBiensSimilaires(evaluation.bien)
+7. ServiceMarche → ServiceEvaluation : biensSimilaires
+8. ServiceEvaluation → GenerateurPDF : genererRapport(evaluation, details, similaires)
+9. GenerateurPDF → GenerateurPDF : creerLayout()
+10. GenerateurPDF → GenerateurPDF : ajouterSections()
+11. GenerateurPDF → GenerateurPDF : convertirPDF()
+12. GenerateurPDF → ServiceEvaluation : fichierPDF
+13. ServiceEvaluation → StockageS3 : upload(fichierPDF, rapportId)
+14. StockageS3 → ServiceEvaluation : urlPDF
+15. ServiceEvaluation → Agent : urlRapportPDF
+```
+
+**Séquence 4 : Mise à Jour du Modèle ML**
+
+**Acteurs :**
+- Admin
+- ServiceML
+- DataSource
+- ModeleML
+- Monitoring
+
+**Scénario :**
+```
+1. Admin → ServiceML : lancerMiseAJourModele()
+2. ServiceML → DataSource : getNouvellesDonnees(dateDerniereMiseAJour)
+3. DataSource → ServiceML : nouvellesDonnees
+4. ServiceML → ServiceML : nettoyerDonnees(nouvellesDonnees)
+5. ServiceML → ServiceML : diviserDataset(dataset, train=0.8, test=0.2)
+6. ServiceML → ModeleML : entrainer(trainData)
+7. ModeleML → ModeleML : optimiserHyperparametres()
+8. ModeleML → ServiceML : modeleEntraîne
+9. ServiceML → ModeleML : valider(testData)
+10. ModeleML → ServiceML : metriquesValidation
+11. ServiceML → Monitoring : comparerPerformances(metriquesValidation)
+12. Monitoring → ServiceML : amelorationSignificative(true)
+13. ServiceML → ServiceML : deployerModele(modeleEntraîne)
+14. ServiceML → Admin : confirmationMiseAJour()
+```
+
+**Séquence 5 : Authentification et Session Utilisateur**
+
+**Acteurs :**
+- Utilisateur
+- AuthService
+- JWTService
+- BDD
+
+**Scénario :**
+```
+1. Utilisateur → AuthService : login(email, password)
+2. AuthService → BDD : findUserByEmail(email)
+3. BDD → AuthService : user
+4. AuthService → AuthService : verifyPassword(password, user.passwordHash)
+5. AuthService → JWTService : generateToken(user)
+6. JWTService → AuthService : jwtToken
+7. AuthService → AuthService : createSession(user, jwtToken)
+8. AuthService → BDD : saveSession(session)
+9. AuthService → Utilisateur : authResponse(jwtToken, userInfo)
+10. Utilisateur → AuthService : requeteProtegee(jwtToken)
+11. AuthService → JWTService : validateToken(jwtToken)
+12. JWTService → AuthService : tokenValid
+13. AuthService → BDD : getSession(token)
+14. BDD → AuthService : session
+15. AuthService → Utilisateur : responseDonnees()
+```
+
+**Points de synchronisation :**
+- **[concurrent]** : Plusieurs utilisateurs peuvent faire des prédictions simultanément
+- **[critical]** : Mise à jour du modèle (pas de prédictions pendant déploiement)
+- **[atomic]** : Sauvegarde d'une évaluation (transaction complète)
+
+**Messages asynchrones :**
+- Notification de changement de prix
+- Rapport de performance quotidien
+- Alertes de maintenance système
+
+---
+
+Notes d'implémentation :
+- Les diagrammes suivent les standards UML 2.5
+- Les noms de classes et méthodes sont en français pour cohérence avec le projet
+- Les patterns architecturaux utilisés : MVC, Repository, Service, Factory
+- Technologies suggérées : Python/Django pour backend, React pour frontend, PostgreSQL pour BDD

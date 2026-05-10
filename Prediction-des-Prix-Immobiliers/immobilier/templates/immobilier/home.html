@@ -1,0 +1,142 @@
+{% extends 'immobilier/base.html' %}
+
+{% block title %}Accueil - Prediction des Prix Immobiliers{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4 mb-4">Prediction des Prix Immobiliers</h1>
+        <p class="lead mb-4">Estimez la valeur de votre bien immobilier avec notre technologie de prédiction avancée</p>
+        <a href="{% url 'immobilier:predict_price' %}" class="btn btn-light btn-lg">
+            <i class="fas fa-calculator"></i> Prédire un prix maintenant
+        </a>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="stats-card">
+                <i class="fas fa-home fa-3x mb-3 text-primary"></i>
+                <div class="stats-number">{{ total_properties }}</div>
+                <h5>Biens immobiliers</h5>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <i class="fas fa-euro-sign fa-3x mb-3 text-success"></i>
+                <div class="stats-number">{{ avg_price|floatformat:0 }}D</div>
+                <h5>Prix moyen</h5>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stats-card">
+                <i class="fas fa-chart-line fa-3x mb-3 text-info"></i>
+                <div class="stats-number">95%</div>
+                <h5>Précision de prédiction</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <h2 class="text-center mb-4">Biens immobiliers récents</h2>
+    <div class="row">
+        {% for property in recent_properties %}
+        <div class="col-md-4 mb-4">
+            <div class="card property-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ property.title }}</h5>
+                    <p class="card-text">
+                        <i class="fas fa-map-marker-alt"></i> {{ property.city }}<br>
+                        <i class="fas fa-expand"></i> {{ property.surface }}m² | 
+                        <i class="fas fa-bed"></i> {{ property.rooms }} pièces<br>
+                        <span class="badge bg-{{ property.property_type|default:'secondary' }}">
+                            {{ property.get_property_type_display }}
+                        </span>
+                    </p>
+                    <div class="price-tag">{{ property.price|floatformat:0 }}D</div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'immobilier:property_detail' property.pk %}" class="btn btn-primary btn-sm">
+                        Voir détails
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'immobilier:property_list' %}" class="btn btn-outline-primary">
+            Voir tous les biens <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Comment ça marche ?</h3>
+            <div class="accordion" id="howItWorks">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#step1">
+                            1. Saisissez les caractéristiques
+                        </button>
+                    </h2>
+                    <div id="step1" class="accordion-collapse collapse show" data-bs-parent="#howItWorks">
+                        <div class="accordion-body">
+                            Entrez les informations sur le bien immobilier : type, surface, localisation, etc.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step2">
+                            2. Analyse par notre IA
+                        </button>
+                    </h2>
+                    <div id="step2" class="accordion-collapse collapse" data-bs-parent="#howItWorks">
+                        <div class="accordion-body">
+                            Notre algorithme analyse des milliers de données pour estimer la valeur du bien.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#step3">
+                            3. Obtenez une estimation précise
+                        </button>
+                    </h2>
+                    <div id="step3" class="accordion-collapse collapse" data-bs-parent="#howItWorks">
+                        <div class="accordion-body">
+                            Recevez une estimation de prix avec un indice de confiance et des recommandations.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h3>Pourquoi nous choisir ?</h3>
+            <ul class="list-unstyled">
+                <li class="mb-3">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <strong>Précision exceptionnelle</strong> - Notre modèle entraîné sur des milliers de transactions
+                </li>
+                <li class="mb-3">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <strong>Mise à jour en temps réel</strong> - Données du marché actualisées quotidiennement
+                </li>
+                <li class="mb-3">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <strong>Interface intuitive</strong> - Estimez un prix en quelques clics seulement
+                </li>
+                <li class="mb-3">
+                    <i class="fas fa-check-circle text-success"></i>
+                    <strong>Gratuit et sans engagement</strong> - Accédez à toutes nos fonctionnalités gratuitement
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
