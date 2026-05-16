@@ -1,0 +1,50 @@
+{% extends 'immobilier/base.html' %}
+{% load immobilier_tags %}
+{% block title %}Mon profil{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="card p-4 text-center">
+        {% if user.profile_picture %}
+        <img src="{{ user.profile_picture.url }}" class="rounded-circle mb-3" width="100" height="100" style="object-fit:cover;" alt="Photo">
+        {% else %}
+        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width:80px;height:80px;font-size:2rem;">
+          {{ user.first_name|first|upper }}
+        </div>
+        {% endif %}
+        <h5 class="fw-bold">{{ user.get_full_name }}</h5>
+        <p class="text-muted mb-1">{{ user.email }}</p>
+        {% autoescape off %}{% role_badge user.role %}{% endautoescape %}
+        {% if user.phone %}<p class="text-muted small mt-2">{{ user.phone }}</p>{% endif %}
+        {% if user.bio %}<p class="text-muted small">{{ user.bio }}</p>{% endif %}
+        <a href="{% url 'immobilier:edit_profile' %}" class="btn btn-outline-primary btn-sm mt-3 w-100">
+          <i class="fas fa-edit me-1"></i>Modifier le profil
+        </a>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card p-4">
+        <h5 class="fw-bold mb-3">Mes biens publiés</h5>
+        {% if user_properties %}
+          {% for p in user_properties %}
+          <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+            <div>
+              <a href="{% url 'immobilier:property_detail' p.pk %}" class="fw-semibold text-decoration-none">{{ p.title }}</a>
+              <div class="text-muted small">{{ p.city }} · {{ p.surface }} m²</div>
+            </div>
+            <span class="price-tag">{{ p.price|floatformat:0 }} DT</span>
+          </div>
+          {% endfor %}
+          <a href="{% url 'immobilier:property_list' %}" class="btn btn-outline-primary btn-sm mt-2">Voir tous</a>
+        {% else %}
+          <p class="text-muted">Aucun bien publié.</p>
+          {% if user.can_add_property %}
+          <a href="{% url 'immobilier:add_property' %}" class="btn btn-success btn-sm">Ajouter un bien</a>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

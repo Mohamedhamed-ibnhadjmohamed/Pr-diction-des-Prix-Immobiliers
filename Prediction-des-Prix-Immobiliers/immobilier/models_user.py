@@ -17,6 +17,7 @@ class CustomUser(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
+        db_table = 'customuser'
         verbose_name = "Utilisateur"
         verbose_name_plural = "Utilisateurs"
     
@@ -44,6 +45,7 @@ class UserProfile(models.Model):
     preferences = models.JSONField(default=dict, blank=True)
     
     class Meta:
+        db_table = 'userprofile'
         verbose_name = "Profil utilisateur"
         verbose_name_plural = "Profils utilisateurs"
     

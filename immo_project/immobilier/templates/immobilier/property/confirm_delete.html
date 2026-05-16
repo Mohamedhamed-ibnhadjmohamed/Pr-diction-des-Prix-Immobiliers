@@ -1,0 +1,20 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Supprimer — {{ property.title }}{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card p-4 text-center">
+        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+        <h4 class="fw-bold">Confirmer la suppression</h4>
+        <p class="text-muted">Voulez-vous vraiment supprimer <strong>« {{ property.title }} »</strong> ? Cette action est irréversible.</p>
+        <form method="post" class="d-flex justify-content-center gap-3 mt-3">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger"><i class="fas fa-trash me-1"></i>Supprimer</button>
+          <a href="{% url 'immobilier:property_detail' property.pk %}" class="btn btn-outline-secondary">Annuler</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

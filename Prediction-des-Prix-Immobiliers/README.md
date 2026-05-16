@@ -256,7 +256,7 @@ Prediction-des-Prix-Immobiliers/
 │   ├── urls.py                          # URLs de l'app
 │   ├── templatetags/                    # Template tags personnalisés
 │   │   ├── __init__.py
-│   │   └── immobilier_tags.py
+│   │   └── tags.py
 │   └── templates/immobilier/            # Templates
 │       ├── base.html                    # Template de base
 │       ├── home.html                    # Page d'accueil

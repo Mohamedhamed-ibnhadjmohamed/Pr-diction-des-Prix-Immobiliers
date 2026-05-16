@@ -1,0 +1,107 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Biens immobiliers{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row">
+
+    <!-- Filtres -->
+    <div class="col-md-3 mb-4">
+      <div class="card p-3">
+        <h6 class="fw-bold mb-3"><i class="fas fa-filter me-1"></i>Filtres</h6>
+        <form method="get">
+          <div class="mb-2">
+            <input type="text" name="q" class="form-control form-control-sm" placeholder="Rechercher…" value="{{ filters.q }}">
+          </div>
+          <div class="mb-2">
+            <select name="type" class="form-select form-select-sm">
+              <option value="">Tous les types</option>
+              {% for val, label in property_types %}
+              <option value="{{ val }}" {% if filters.type == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <input type="text" name="city" class="form-control form-control-sm" placeholder="Ville" value="{{ filters.city }}">
+          </div>
+          <div class="mb-2">
+            <input type="number" name="min_price" class="form-control form-control-sm" placeholder="Prix min (DT)" value="{{ filters.min_price }}">
+          </div>
+          <div class="mb-2">
+            <input type="number" name="max_price" class="form-control form-control-sm" placeholder="Prix max (DT)" value="{{ filters.max_price }}">
+          </div>
+          <div class="mb-3">
+            <input type="number" name="min_surface" class="form-control form-control-sm" placeholder="Surface min (m²)" value="{{ filters.min_surface }}">
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm w-100">Filtrer</button>
+          <a href="{% url 'immobilier:property_list' %}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Réinitialiser</a>
+        </form>
+      </div>
+    </div>
+
+    <!-- Liste -->
+    <div class="col-md-9">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold mb-0">{{ page_obj.paginator.count }} bien{{ page_obj.paginator.count|pluralize }}</h4>
+        {% if user.can_add_property %}
+        <a href="{% url 'immobilier:add_property' %}" class="btn btn-success btn-sm">
+          <i class="fas fa-plus me-1"></i>Ajouter un bien
+        </a>
+        {% endif %}
+      </div>
+
+      {% if page_obj.object_list %}
+      <div class="row g-3">
+        {% for p in page_obj %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="badge bg-primary">{{ p.get_property_type_display }}</span>
+                <span class="price-tag">{{ p.price|floatformat:0 }} DT</span>
+              </div>
+              <h6 class="card-title">{{ p.title }}</h6>
+              <p class="text-muted small mb-1"><i class="fas fa-map-marker-alt me-1"></i>{{ p.city }}</p>
+              <p class="text-muted small mb-0">
+                <i class="fas fa-ruler-combined me-1"></i>{{ p.surface }} m²
+                &nbsp;·&nbsp;<i class="fas fa-door-open me-1"></i>{{ p.rooms }} pièces
+              </p>
+            </div>
+            <div class="card-footer bg-transparent">
+              <a href="{% url 'immobilier:property_detail' p.pk %}" class="btn btn-outline-primary btn-sm w-100">Voir le bien</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      {% if page_obj.has_other_pages %}
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ filters.q }}&type={{ filters.type }}&city={{ filters.city }}">‹</a></li>
+          {% endif %}
+          {% for num in page_obj.paginator.page_range %}
+          <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}&q={{ filters.q }}&type={{ filters.type }}&city={{ filters.city }}">{{ num }}</a>
+          </li>
+          {% endfor %}
+          {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ filters.q }}&type={{ filters.type }}&city={{ filters.city }}">›</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+
+      {% else %}
+      <div class="text-center py-5 text-muted">
+        <i class="fas fa-search fa-3x mb-3"></i>
+        <p>Aucun bien trouvé pour ces critères.</p>
+        <a href="{% url 'immobilier:property_list' %}" class="btn btn-outline-primary">Voir tous les biens</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

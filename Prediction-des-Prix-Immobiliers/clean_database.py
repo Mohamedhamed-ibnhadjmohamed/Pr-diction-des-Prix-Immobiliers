@@ -8,21 +8,21 @@ cursor.execute('SET FOREIGN_KEY_CHECKS = 0')
 
 # Liste de toutes les tables à supprimer
 tables = [
-    'immobilier_customuser',
-    'immobilier_userprofile',
-    'immobilier_property',
-    'immobilier_propertyfeature',
-    'immobilier_prediction',
-    'immobilier_favorite',
-    'immobilier_message',
-    'immobilier_propertyrating',
-    'immobilier_searchhistory',
-    'immobilier_notification',
-    'immobilier_userreview',
-    'immobilier_report',
-    'immobilier_propertycomparison',
-    'immobilier_document',
-    'immobilier_recommendation'
+    'customuser',
+    'userprofile',
+    'property',
+    'propertyfeature',
+    'prediction',
+    'favorite',
+    'message',
+    'propertyrating',
+    'searchhistory',
+    'notification',
+    'userreview',
+    'report',
+    'propertycomparison',
+    'document',
+    'recommendation'
 ]
 
 for table in tables:

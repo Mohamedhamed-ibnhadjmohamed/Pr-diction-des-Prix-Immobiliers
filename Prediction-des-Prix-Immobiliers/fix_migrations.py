@@ -21,7 +21,7 @@ def fix_migrations():
         )
         cursor = conn.cursor()
         
-        print("🔧 Correction des migrations en cours...")
+        print("Correction des migrations en cours...")
         
         # Supprimer toutes les tables pour repartir de zéro
         tables_to_drop = [
@@ -34,29 +34,29 @@ def fix_migrations():
             'auth_group',
             'auth_user_groups',
             'auth_user_user_permissions',
-            'immobilier_customuser',
-            'immobilier_userprofile',
-            'immobilier_property',
-            'immobilier_propertyfeature',
-            'immobilier_prediction',
-            'immobilier_favorite',
-            'immobilier_message',
-            'immobilier_propertyrating',
-            'immobilier_searchhistory',
-            'immobilier_notification',
-            'immobilier_userreview',
-            'immobilier_report',
-            'immobilier_propertycomparison',
-            'immobilier_document',
-            'immobilier_recommendation'
+            'customuser',
+            'userprofile',
+            'property',
+            'propertyfeature',
+            'prediction',
+            'favorite',
+            'message',
+            'propertyrating',
+            'searchhistory',
+            'notification',
+            'userreview',
+            'report',
+            'propertycomparison',
+            'document',
+            'recommendation'
         ]
         
         for table in tables_to_drop:
             try:
                 cursor.execute(f'DROP TABLE IF EXISTS {table}')
-                print(f"  ✅ Table {table} supprimée")
+                print(f"  Table {table} supprimee")
             except Exception as e:
-                print(f"  ⚠️  Erreur suppression table {table}: {e}")
+                print(f"  Erreur suppression table {table}: {e}")
         
         conn.commit()
         
@@ -64,19 +64,19 @@ def fix_migrations():
         migration_file = 'immobilier/migrations/0001_initial.py'
         if os.path.exists(migration_file):
             os.remove(migration_file)
-            print(f"  ✅ Fichier {migration_file} supprimé")
+            print(f"  Fichier {migration_file} supprime")
         
         cursor.close()
         conn.close()
         
-        print("✅ Nettoyage terminé. Vous pouvez maintenant exécuter:")
+        print("Nettoyage termine. Vous pouvez maintenant executer:")
         print("   python manage.py makemigrations")
         print("   python manage.py migrate")
         
         return True
         
     except Exception as e:
-        print(f"❌ Erreur: {e}")
+        print(f"Erreur: {e}")
         return False
 
 if __name__ == "__main__":

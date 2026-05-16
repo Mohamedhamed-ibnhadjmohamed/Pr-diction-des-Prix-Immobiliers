@@ -1,0 +1,68 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Estimer un prix{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card p-4">
+        <div class="text-center mb-4">
+          <i class="fas fa-calculator fa-2x text-primary mb-2"></i>
+          <h2 class="fw-bold">Estimer le prix d'un bien</h2>
+          <p class="text-muted">Remplissez les informations pour obtenir une estimation.</p>
+        </div>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Type de bien *</label>
+              {{ form.property_type }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Ville *</label>
+              {{ form.city }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Surface (m²) *</label>
+              {{ form.surface }}
+              {% if form.surface.errors %}<div class="text-danger small">{{ form.surface.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Pièces *</label>
+              {{ form.rooms }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">Chambres</label>
+              {{ form.bedrooms }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Année de construction</label>
+              {{ form.construction_year }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Équipements</label>
+              <div class="row g-2">
+                {% for field in form %}
+                  {% if field.field.widget.input_type == 'checkbox' %}
+                  <div class="col-6 col-md-4">
+                    <div class="form-check">
+                      {{ field }} <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    </div>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <button type="submit" class="btn btn-primary btn-lg w-100">
+              <i class="fas fa-calculator me-2"></i>Obtenir l'estimation
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
