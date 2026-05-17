@@ -1,203 +1,30 @@
 {% extends 'immobilier/base.html' %}
-{% load static %}
-
-{% block title %}Tableau de bord - Vendeur{% endblock %}
-
+{% block title %}Tableau de bord — Vendeur{% endblock %}
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <h1><i class="fas fa-store"></i> Tableau de bord - Vendeur</h1>
-            <p class="text-muted">Bienvenue {{ user.get_full_name|default:user.email }}</p>
-        </div>
+<div class="container my-5">
+  <h2 class="fw-bold mb-4"><i class="fas fa-store me-2"></i>Tableau de bord Vendeur</h2>
+  <div class="row g-4 mb-4">
+    <div class="col-md-3"><div class="card p-3 text-center"><div class="fs-2 fw-bold text-primary">{{ total_properties }}</div><small class="text-muted">Biens publiés</small></div></div>
+    <div class="col-md-3"><div class="card p-3 text-center"><div class="fs-2 fw-bold text-warning">{{ total_favorites }}</div><small class="text-muted">Mis en favoris</small></div></div>
+    <div class="col-md-3"><div class="card p-3 text-center"><div class="fs-2 fw-bold text-danger">{{ unread_messages }}</div><small class="text-muted">Messages non lus</small></div></div>
+    <div class="col-md-3"><div class="card p-3 text-center">
+      <a href="{% url 'immobilier:add_property' %}" class="btn btn-success btn-sm w-100"><i class="fas fa-plus me-1"></i>Ajouter un bien</a>
+    </div></div>
+  </div>
+  <div class="card p-4">
+    <h5 class="fw-bold mb-3">Mes biens</h5>
+    {% for p in my_properties %}
+    <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+      <div>
+        <a href="{% url 'immobilier:property_detail' p.pk %}" class="text-decoration-none fw-semibold">{{ p.title }}</a>
+        <div class="text-muted small">{{ p.city }} · {{ p.surface }} m² · {{ p.get_property_type_display }}</div>
+      </div>
+      <div class="text-end">
+        <div class="fw-bold text-success">{{ p.price|floatformat:0 }} DT</div>
+        <a href="{% url 'immobilier:edit_property' p.pk %}" class="btn btn-outline-secondary btn-sm">Modifier</a>
+      </div>
     </div>
-
-    <!-- Statistiques -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card stats-card bg-primary text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Mes Biens</h5>
-                    <div class="stats-number">{{ total_properties }}</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stats-card bg-info text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Vues Totales</h5>
-                    <div class="stats-number">{{ total_views }}</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stats-card bg-warning text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Favoris Reçus</h5>
-                    <div class="stats-number">{{ total_favorites }}</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stats-card bg-success text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Messages</h5>
-                    <div class="stats-number">{{ unread_messages }}</div>
-                    <small>non lus</small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <!-- Mes biens -->
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5><i class="fas fa-home"></i> Mes biens</h5>
-                    <a href="{% url 'immobilier:add_property' %}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus"></i> Ajouter
-                    </a>
-                </div>
-                <div class="card-body">
-                    {% if my_properties %}
-                        {% for property in my_properties %}
-                        <div class="card mb-3">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    {% if property.image %}
-                                        <img src="{{ property.image.url }}" class="img-fluid rounded-start" alt="{{ property.title }}">
-                                    {% else %}
-                                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                                            <i class="fas fa-home fa-3x text-muted"></i>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <a href="{% url 'immobilier:property_detail' property.pk %}">
-                                                {{ property.title }}
-                                            </a>
-                                        </h5>
-                                        <p class="card-text">
-                                            <span class="badge bg-secondary">{{ property.get_property_type_display }}</span>
-                                            <span class="text-muted">{{ property.city }}</span>
-                                        </p>
-                                        <p class="card-text">
-                                            <small class="text-muted">{{ property.surface }}m² - {{ property.rooms }} pièces</small>
-                                        </p>
-                                        <p class="card-text">
-                                            <strong class="text-success">{{ property.price|floatformat:0 }}D</strong>
-                                        </p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small class="text-muted">{{ property.created_at|date:"d/m/Y" }}</small>
-                                            <div>
-                                                <a href="#" class="btn btn-outline-primary btn-sm">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-outline-danger btn-sm">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-home fa-4x text-muted mb-3"></i>
-                            <p class="text-muted">Vous n'avez pas encore ajouté de bien.</p>
-                            <a href="{% url 'immobilier:add_property' %}" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Ajouter mon premier bien
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Activité récente -->
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-chart-line"></i> Activité récente</h5>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <h6>Messages reçus</h6>
-                        {% if unread_messages > 0 %}
-                            <div class="alert alert-info">
-                                <i class="fas fa-envelope"></i> {{ unread_messages }} message(s) non lu(s)
-                                <a href="{% url 'immobilier:inbox' %}" class="btn btn-sm btn-info float-end">Voir</a>
-                            </div>
-                        {% else %}
-                            <p class="text-muted">Aucun nouveau message</p>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <h6>Favoris reçus</h6>
-                        {% if total_favorites > 0 %}
-                            <p class="text-success">
-                                <i class="fas fa-heart"></i> {{ total_favorites }} personne(s) ont ajouté vos biens en favori
-                            </p>
-                        {% else %}
-                            <p class="text-muted">Aucun favori reçu</p>
-                        {% endif %}
-                    </div>
-                    
-                    <div>
-                        <h6>Performance</h6>
-                        <div class="progress mb-2">
-                            <div class="progress-bar" role="progressbar" style="width: {{ total_properties|mul:10 }}%">
-                                {{ total_properties }} biens
-                            </div>
-                        </div>
-                        <small class="text-muted">Continuez d'ajouter des biens pour augmenter votre visibilité!</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Actions rapides -->
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h5><i class="fas fa-bolt"></i> Actions rapides</h5>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'immobilier:add_property' %}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Ajouter un bien
-                        </a>
-                        <a href="{% url 'immobilier:inbox' %}" class="btn btn-outline-primary">
-                            <i class="fas fa-envelope"></i> Messages
-                            {% if unread_messages > 0 %}
-                                <span class="badge bg-danger">{{ unread_messages }}</span>
-                            {% endif %}
-                        </a>
-                        <a href="{% url 'immobilier:favorites_list' %}" class="btn btn-outline-info">
-                            <i class="fas fa-heart"></i> Voir les favoris
-                        </a>
-                        <a href="{% url 'immobilier:export' %}" class="btn btn-outline-success">
-                            <i class="fas fa-download"></i> Exporter
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% empty %}<p class="text-muted">Aucun bien publié.</p>{% endfor %}
+  </div>
 </div>
-
-<!-- Template filter for multiplication -->
-{% comment %}
-Add this to your template tags:
-from django import template
-register = template.Library()
-
-@register.filter
-def mul(value, arg):
-    return value * arg
-{% endcomment %}
 {% endblock %}

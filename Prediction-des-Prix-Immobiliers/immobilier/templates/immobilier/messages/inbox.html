@@ -1,301 +1,48 @@
 {% extends 'immobilier/base.html' %}
-{% load static %}
-
-{% block title %}Boîte de réception{% endblock %}
-
+{% block title %}Messagerie{% endblock %}
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <h1><i class="fas fa-inbox"></i> Boîte de réception</h1>
-            {% if unread_count > 0 %}
-                <div class="alert alert-info">
-                    <i class="fas fa-envelope"></i> 
-                    Vous avez <strong>{{ unread_count }}</strong> message(s) non lu(s)
-                </div>
-            {% endif %}
+<div class="container my-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0"><i class="fas fa-envelope me-2"></i>Messagerie
+      {% if unread_count %}<span class="badge bg-danger ms-2">{{ unread_count }}</span>{% endif %}
+    </h2>
+    <a href="{% url 'immobilier:send_message' %}" class="btn btn-primary btn-sm"><i class="fas fa-pen me-1"></i>Nouveau message</a>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="card p-4">
+        <h5 class="fw-bold mb-3">Reçus</h5>
+        {% for m in received %}
+        <div class="border-bottom pb-2 mb-2 {% if not m.is_read %}bg-light rounded p-2{% endif %}">
+          <div class="d-flex justify-content-between">
+            <strong class="small">{{ m.sender.get_full_name|default:m.sender.email|truncatechars:25 }}</strong>
+            <small class="text-muted">{{ m.created_at|date:"d/m/Y" }}</small>
+          </div>
+          <div class="small fw-semibold">{{ m.subject }}</div>
+          <div class="text-muted small">{{ m.content|truncatechars:80 }}</div>
+          {% if not m.is_read %}
+          <a href="{% url 'immobilier:mark_message_read' m.pk %}" class="btn btn-outline-secondary btn-sm mt-1">Marquer lu</a>
+          {% endif %}
         </div>
+        {% empty %}<p class="text-muted small">Aucun message reçu.</p>{% endfor %}
+      </div>
     </div>
-
-    <!-- Onglets -->
-    <ul class="nav nav-tabs mb-4" id="messageTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" 
-                    type="button" role="tab">
-                <i class="fas fa-inbox"></i> Messages reçus
-                {% if unread_count > 0 %}
-                    <span class="badge bg-danger">{{ unread_count }}</span>
-                {% endif %}
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent" 
-                    type="button" role="tab">
-                <i class="fas fa-paper-plane"></i> Messages envoyés
-            </button>
-        </li>
-    </ul>
-
-    <div class="tab-content" id="messageTabsContent">
-        <!-- Messages reçus -->
-        <div class="tab-pane fade show active" id="received" role="tabpanel">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5><i class="fas fa-inbox"></i> Messages reçus</h5>
-                    <div>
-                        <button class="btn btn-sm btn-outline-primary" onclick="markAllAsRead()">
-                            <i class="fas fa-check-double"></i> Tout marquer comme lu
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    {% if received_messages %}
-                        <!-- Pagination -->
-                        {% if page_obj.has_other_pages %}
-                            <nav aria-label="Pagination messages reçus">
-                                <ul class="pagination pagination-sm">
-                                    {% if page_obj.has_previous %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
-                                        </li>
-                                    {% endif %}
-                                    
-                                    {% for num in page_obj.paginator.page_range %}
-                                        {% if page_obj.number == num %}
-                                            <li class="page-item active">
-                                                <span class="page-link">{{ num }}</span>
-                                            </li>
-                                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                            </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                    
-                                    {% if page_obj.has_next %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a>
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            </nav>
-                        {% endif %}
-
-                        <!-- Liste des messages -->
-                        <div class="list-group">
-                            {% for message in received_messages %}
-                                <div class="list-group-item {% if not message.is_read %}bg-light{% endif %}">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <div class="d-flex justify-content-between">
-                                                <h6 class="mb-1 {% if not message.is_read %}fw-bold{% endif %}">
-                                                    {% if not message.is_read %}
-                                                        <i class="fas fa-circle text-primary" style="font-size: 0.5rem;"></i>
-                                                    {% endif %}
-                                                    {{ message.subject }}
-                                                </h6>
-                                                <small class="text-muted">{{ message.created_at|date:"d/m/Y H:i" }}</small>
-                                            </div>
-                                            <p class="mb-1">{{ message.content|truncatewords:20 }}</p>
-                                            <div class="d-flex align-items-center">
-                                                <small class="text-muted">
-                                                    <i class="fas fa-user"></i> De: {{ message.sender.email }}
-                                                </small>
-                                                {% if message.property %}
-                                                    <small class="text-muted ms-3">
-                                                        <i class="fas fa-home"></i> 
-                                                        <a href="{% url 'immobilier:property_detail' message.property.pk %}">
-                                                            {{ message.property.title }}
-                                                        </a>
-                                                    </small>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="ms-3">
-                                            <div class="btn-group-vertical" role="group">
-                                                <button class="btn btn-sm btn-outline-primary" 
-                                                        onclick="viewMessage({{ message.pk }})">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                {% if not message.is_read %}
-                                                    <button class="btn btn-sm btn-outline-success" 
-                                                            onclick="markAsRead({{ message.pk }})">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="text-center py-5">
-                            <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
-                            <h5>Aucun message reçu</h5>
-                            <p class="text-muted">Vous n'avez pas encore reçu de message.</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
+    <div class="col-md-6">
+      <div class="card p-4">
+        <h5 class="fw-bold mb-3">Envoyés</h5>
+        {% for m in sent %}
+        <div class="border-bottom pb-2 mb-2">
+          <div class="d-flex justify-content-between">
+            <strong class="small">→ {{ m.recipient.get_full_name|default:m.recipient.email|truncatechars:25 }}</strong>
+            <small class="text-muted">{{ m.created_at|date:"d/m/Y" }}</small>
+          </div>
+          <div class="small fw-semibold">{{ m.subject }}</div>
+          <div class="text-muted small">{{ m.content|truncatechars:80 }}</div>
         </div>
-
-        <!-- Messages envoyés -->
-        <div class="tab-pane fade" id="sent" role="tabpanel">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-paper-plane"></i> Messages envoyés</h5>
-                </div>
-                <div class="card-body">
-                    {% if sent_messages %}
-                        <div class="list-group">
-                            {% for message in sent_messages %}
-                                <div class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <div class="d-flex justify-content-between">
-                                                <h6 class="mb-1">{{ message.subject }}</h6>
-                                                <small class="text-muted">{{ message.created_at|date:"d/m/Y H:i" }}</small>
-                                            </div>
-                                            <p class="mb-1">{{ message.content|truncatewords:20 }}</p>
-                                            <div class="d-flex align-items-center">
-                                                <small class="text-muted">
-                                                    <i class="fas fa-user"></i> À: {{ message.recipient.email }}
-                                                </small>
-                                                {% if message.property %}
-                                                    <small class="text-muted ms-3">
-                                                        <i class="fas fa-home"></i> 
-                                                        <a href="{% url 'immobilier:property_detail' message.property.pk %}">
-                                                            {{ message.property.title }}
-                                                        </a>
-                                                    </small>
-                                                {% endif %}
-                                                {% if message.is_read %}
-                                                    <small class="text-success ms-3">
-                                                        <i class="fas fa-check-double"></i> Lu
-                                                    </small>
-                                                {% else %}
-                                                    <small class="text-warning ms-3">
-                                                        <i class="fas fa-clock"></i> Non lu
-                                                    </small>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="text-center py-5">
-                            <i class="fas fa-paper-plane fa-4x text-muted mb-3"></i>
-                            <h5>Aucun message envoyé</h5>
-                            <p class="text-muted">Vous n'avez pas encore envoyé de message.</p>
-                            <a href="{% url 'immobilier:property_list' %}" class="btn btn-primary">
-                                <i class="fas fa-search"></i> Trouver des biens à contacter
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        {% empty %}<p class="text-muted small">Aucun message envoyé.</p>{% endfor %}
+      </div>
     </div>
+  </div>
 </div>
-
-<!-- Modal pour voir le message complet -->
-<div class="modal fade" id="messageModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Message</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="messageContent">
-                <!-- Le contenu sera chargé dynamiquement -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                <button type="button" class="btn btn-primary" id="replyButton">Répondre</button>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-function markAsRead(messageId) {
-    fetch(`/immobilier/mark-message-read/${messageId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
-            'Content-Type': 'application/json',
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            location.reload();
-        }
-    });
-}
-
-function markAllAsRead() {
-    // Marquer tous les messages non lus comme lus
-    const unreadMessages = document.querySelectorAll('.list-group-item .fa-circle');
-    unreadMessages.forEach(icon => {
-        const messageItem = icon.closest('.list-group-item');
-        const messageId = messageItem.querySelector('button[onclick*="markAsRead"]').getAttribute('onclick').match(/\d+/)[0];
-        markAsRead(messageId);
-    });
-}
-
-function viewMessage(messageId) {
-    // Charger le contenu complet du message
-    fetch(`/immobilier/message-detail/${messageId}/`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('messageContent').innerHTML = `
-                <div class="message-detail">
-                    <div class="mb-3">
-                        <strong>De:</strong> ${data.sender}<br>
-                        <strong>À:</strong> ${data.recipient}<br>
-                        <strong>Date:</strong> ${data.created_at}<br>
-                        ${data.property ? `<strong>Bien:</strong> <a href="/immobilier/property/${data.property_id}/">${data.property}</a><br>` : ''}
-                    </div>
-                    <hr>
-                    <h6>${data.subject}</h6>
-                    <p>${data.content}</p>
-                </div>
-            `;
-            
-            // Configurer le bouton de réponse
-            document.getElementById('replyButton').onclick = function() {
-                // Rediriger vers la page de réponse
-                window.location.href = `/immobilier/send-message/?reply_to=${messageId}`;
-            };
-            
-            // Afficher la modal
-            const modal = new bootstrap.Modal(document.getElementById('messageModal'));
-            modal.show();
-            
-            // Marquer comme lu
-            markAsRead(messageId);
-        });
-}
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-</script>
 {% endblock %}

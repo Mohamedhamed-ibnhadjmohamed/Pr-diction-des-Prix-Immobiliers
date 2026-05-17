@@ -1,114 +1,38 @@
 {% extends 'immobilier/base.html' %}
-{% load static %}
-
 {% block title %}Envoyer un message{% endblock %}
-
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h4><i class="fas fa-envelope"></i> Envoyer un message</h4>
-                </div>
-                <div class="card-body">
-                    {% if property_id %}
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> 
-                            Vous envoyez un message concernant le bien: 
-                            <strong>{{ property.title }}</strong>
-                        </div>
-                    {% endif %}
-
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label for="{{ form.recipient.id_for_label }}" class="form-label">
-                                <i class="fas fa-user"></i> Destinataire
-                            </label>
-                            {{ form.recipient }}
-                            {% if form.recipient.errors %}
-                                <div class="text-danger">
-                                    {{ form.recipient.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        {% if property_id %}
-                            <div class="mb-3">
-                                <label class="form-label">
-                                    <i class="fas fa-home"></i> Bien concerné
-                                </label>
-                                <input type="text" class="form-control" value="{{ property.title }}" readonly>
-                            </div>
-                        {% else %}
-                            <div class="mb-3">
-                                <label for="{{ form.property.id_for_label }}" class="form-label">
-                                    <i class="fas fa-home"></i> Bien concerné (optionnel)
-                                </label>
-                                {{ form.property }}
-                                {% if form.property.errors %}
-                                    <div class="text-danger">
-                                        {{ form.property.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-
-                        <div class="mb-3">
-                            <label for="{{ form.subject.id_for_label }}" class="form-label">
-                                <i class="fas fa-heading"></i> Sujet
-                            </label>
-                            {{ form.subject }}
-                            {% if form.subject.errors %}
-                                <div class="text-danger">
-                                    {{ form.subject.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="{{ form.content.id_for_label }}" class="form-label">
-                                <i class="fas fa-comment"></i> Message
-                            </label>
-                            {{ form.content }}
-                            {% if form.content.errors %}
-                                <div class="text-danger">
-                                    {{ form.content.errors }}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-                            <a href="{% if property_id %}{% url 'immobilier:property_detail' property_id %}{% else %}{% url 'immobilier:inbox' %}{% endif %}" 
-                               class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Annuler
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-paper-plane"></i> Envoyer le message
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Conseils -->
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h6><i class="fas fa-lightbulb"></i> Conseils pour un bon message</h6>
-                </div>
-                <div class="card-body">
-                    <ul class="list-unstyled mb-0">
-                        <li><i class="fas fa-check text-success"></i> Soyez clair et concis</li>
-                        <li><i class="fas fa-check text-success"></i> Indiquez vos coordonnées si nécessaire</li>
-                        <li><i class="fas fa-check text-success"></i> Posez des questions spécifiques sur le bien</li>
-                        <li><i class="fas fa-check text-success"></i> Proposez des créneaux pour visiter si intéressé</li>
-                        <li><i class="fas fa-check text-success"></i> Restez poli et professionnel</li>
-                    </ul>
-                </div>
-            </div>
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card p-4">
+        <h3 class="fw-bold mb-4"><i class="fas fa-paper-plane me-2"></i>Envoyer un message</h3>
+        {% if property %}
+        <div class="alert alert-info small mb-3">
+          <i class="fas fa-home me-1"></i>
+          Concernant : <strong>{{ property.title }}</strong> — {{ property.city }}
         </div>
+        {% endif %}
+        {% if recipient %}
+        <p class="text-muted small mb-3">Destinataire : <strong>{{ recipient.get_full_name|default:recipient.email }}</strong></p>
+        {% endif %}
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% if recipient %}<input type="hidden" name="recipient_id" value="{{ recipient.pk }}">{% endif %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Sujet</label>
+            {{ form.subject }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Message</label>
+            {{ form.content }}
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane me-1"></i>Envoyer</button>
+            <a href="{% url 'immobilier:inbox' %}" class="btn btn-outline-secondary">Annuler</a>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}
